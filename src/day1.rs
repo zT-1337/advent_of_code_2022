@@ -1,16 +1,5 @@
-use std::fs::File;
-use std::io::{BufReader, BufRead};
-use std::path::Path;
-
-pub fn load_lines_of_file(path: &str) -> BufReader<File> {
-    let path = Path::new(path);
-    let file = match File::open(&path) {
-        Ok(file) => BufReader::new(file),
-        Err(why) => panic!("Failed to open file {}: {}", path.display(), why)
-    };
-
-    file
-}
+use crate::util::load_lines_of_file;
+use std::io::BufRead;
 
 pub fn day1_star_1() {
     let file = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day1.input");
