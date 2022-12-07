@@ -102,5 +102,5 @@ pub fn day_2_star_2() {
         score += myself.points_for_outcome(&opponent);
     }
 
-    println!("Result of Advent of Code Day 2, Star 1: {}", score);
+    println!("Result of Advent of Code Day 2, Star 2: {}", score);
 }
