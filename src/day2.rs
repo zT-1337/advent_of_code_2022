@@ -1,5 +1,4 @@
 use crate::util::load_lines_of_file;
-use std::io::BufRead;
 
 #[derive(Clone)]
 enum RpsChoice {
@@ -56,16 +55,11 @@ impl RpsChoice {
 }
 
 pub fn day_2_star_1() {
-    let file = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day2.input");
+    let lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day2.input");
 
     let mut score: u32 = 0;
 
-    for line in file.lines() {
-        let line = match line {
-            Ok(value) => value,
-            Err(why) => panic!("Reading line failed: {}", why),
-        };
-
+    for line in lines {
         if line.len() != 3 {
             break;
         }
@@ -81,16 +75,11 @@ pub fn day_2_star_1() {
 }
 
 pub fn day_2_star_2() {
-    let file = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day2.input");
+    let lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day2.input");
 
     let mut score: u32 = 0;
 
-    for line in file.lines() {
-        let line = match line {
-            Ok(value) => value,
-            Err(why) => panic!("Reading line failed: {}", why),
-        };
-
+    for line in lines {
         if line.len() != 3 {
             break;
         }

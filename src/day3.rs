@@ -1,18 +1,11 @@
-use std::io::BufRead;
-
 use crate::util::load_lines_of_file;
 
 pub fn day_3_star_1() {
-    let file = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day3.input");
+    let lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day3.input");
 
     let mut sum_of_priority_collisions: u64 = 0;
 
-    for line in file.lines() {
-        let line = match line {
-            Ok(value) => value,
-            Err(why) => panic!("Could not read line: {}", why),
-        };
-
+    for line in lines {
         if line == "" {
             break;
         }
@@ -33,29 +26,15 @@ pub fn day_3_star_1() {
 }
 
 pub fn day_3_star_2() {
-    let file = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day3.input");
+    let lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day3.input");
     let mut sum_of_badge_priorities: u64 = 0;
-    let mut lines: Vec<String> = vec![];
-
-    for line in file.lines() {
-        let line = match line {
-            Ok(value) => value,
-            Err(why) => panic!("Could not read line: {}", why),
-        };
-
-        if line == "" {
-            break;
-        }
-
-        lines.push(line);
-    }
-
-    if lines.len() % 3 != 0 {
-        panic!("Incomplete group of 3 elves");
-    }
 
     let mut i = 0;
     while i < lines.len() {
+        if lines[i] == "" {
+            break;
+        }
+
         let mut first_bloom_filter: u64 = 0;
         let mut second_bloom_filter: u64 = 0;
         let mut third_bloom_filter: u64 = 0;

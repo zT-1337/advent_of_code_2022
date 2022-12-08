@@ -1,18 +1,12 @@
 use crate::util::load_lines_of_file;
-use std::io::BufRead;
 
 pub fn day1_star_1() {
-    let file = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day1.input");
+    let lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day1.input");
 
     let mut current_max: u32 = 0;
     let mut current_val: u32 = 0;
 
-    for line in file.lines() {
-        let line = match line {
-            Ok(value) => value,
-            Err(why) => panic!("Reading line failed: {}", why),
-        };
-
+    for line in lines {
         if line == "" {
             current_max = if current_val > current_max {
                 current_val
@@ -35,16 +29,11 @@ pub fn day1_star_1() {
 }
 
 pub fn day1_star_2() {
-    let file = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day1.input");
+    let lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day1.input");
     let mut top_three_elves = vec![0, 0, 0];
     let mut current_elve = 0;
 
-    for line in file.lines() {
-        let line = match line {
-            Ok(value) => value,
-            Err(why) => panic!("Reading line failed: {}", why),
-        };
-
+    for line in lines {
         if line == "" {
             for i in 0..top_three_elves.len() {
                 if current_elve > top_three_elves[i] {
