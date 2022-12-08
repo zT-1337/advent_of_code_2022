@@ -14,13 +14,19 @@ pub fn day1_star_1() {
         };
 
         if line == "" {
-            current_max = if current_val > current_max {current_val} else {current_max};
+            current_max = if current_val > current_max {
+                current_val
+            } else {
+                current_max
+            };
             current_val = 0;
             continue;
         }
 
         match line.parse::<u32>() {
-            Ok(value) => {current_val += value;}
+            Ok(value) => {
+                current_val += value;
+            }
             Err(why) => panic!("Could not parse line '{}': {}", line, why),
         };
     }
@@ -53,10 +59,15 @@ pub fn day1_star_2() {
         }
 
         match line.parse::<u32>() {
-            Ok(value) => {current_elve += value;}
+            Ok(value) => {
+                current_elve += value;
+            }
             Err(why) => panic!("Could not parse line '{}': {}", line, why),
         };
     }
 
-    println!("Result of Advent of Code Day 1, Star 2: {}", top_three_elves.iter().sum::<u32>());
+    println!(
+        "Result of Advent of Code Day 1, Star 2: {}",
+        top_three_elves.iter().sum::<u32>()
+    );
 }

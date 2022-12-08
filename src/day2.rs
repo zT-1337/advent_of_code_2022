@@ -5,7 +5,7 @@ use std::io::BufRead;
 enum RpsChoice {
     Rock,
     Paper,
-    Scissor
+    Scissor,
 }
 
 impl RpsChoice {
@@ -20,7 +20,7 @@ impl RpsChoice {
             _ => panic!("Unexpected from: {}", from),
         }
     }
-    
+
     fn convert_from_opponent_and_result(opponent: &RpsChoice, result: &str) -> Self {
         match (opponent, result) {
             (RpsChoice::Rock, "X") => RpsChoice::Scissor,
@@ -50,7 +50,7 @@ impl RpsChoice {
             (RpsChoice::Paper, RpsChoice::Rock) => 6,
             (RpsChoice::Scissor, RpsChoice::Rock) => 0,
             (RpsChoice::Scissor, RpsChoice::Paper) => 6,
-            (_,_) => 3,
+            (_, _) => 3,
         }
     }
 }
