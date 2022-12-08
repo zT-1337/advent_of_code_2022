@@ -10,7 +10,7 @@ impl Range {
         let start = start.parse::<u32>().unwrap();
         let end = end.parse::<u32>().unwrap();
 
-        Self {start, end}
+        Self { start, end }
     }
 
     fn contains(&self, other: &Range) -> bool {
@@ -18,8 +18,8 @@ impl Range {
     }
 
     fn overlaps(&self, other: &Range) -> bool {
-        self.start <= other.start && other.start <= self.end ||
-        other.start <= self.start && self.start <= other.end
+        self.start <= other.start && other.start <= self.end
+            || other.start <= self.start && self.start <= other.end
     }
 }
 
@@ -51,6 +51,12 @@ pub fn day_4_star_1_and_2() {
         }
     }
 
-    println!("Result of Advent of Code Day 4, Star 1: {}", sum_of_contains);
-    println!("Result of Advent of Code Day 4, Star 2: {}", sum_of_overlaps);
+    println!(
+        "Result of Advent of Code Day 4, Star 1: {}",
+        sum_of_contains
+    );
+    println!(
+        "Result of Advent of Code Day 4, Star 2: {}",
+        sum_of_overlaps
+    );
 }
