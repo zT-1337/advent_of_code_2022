@@ -25,7 +25,7 @@ pub fn day1_star_1() {
         };
     }
 
-    println!("Advent of Code Day 1 result: {}", current_max);
+    println!("Result of Advent of Code Day 1, Star 1: {}", current_max);
 }
 
 pub fn day1_star_2() {
@@ -58,5 +58,5 @@ pub fn day1_star_2() {
         };
     }
 
-    println!("Advent of Code Day 2 result: {}", top_three_elves.iter().sum::<u32>());
+    println!("Result of Advent of Code Day 1, Star 2: {}", top_three_elves.iter().sum::<u32>());
 }
