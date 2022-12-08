@@ -54,10 +54,11 @@ impl RpsChoice {
     }
 }
 
-pub fn day_2_star_1() {
+pub fn day_2_star_1_and_2() {
     let lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day2.input");
 
-    let mut score: u32 = 0;
+    let mut score_star_1: u32 = 0;
+    let mut score_star_2: u32 = 0;
 
     for line in lines {
         if line.len() != 3 {
@@ -65,31 +66,16 @@ pub fn day_2_star_1() {
         }
 
         let opponent = RpsChoice::convert_from(&line[0..1]);
+
         let myself = RpsChoice::convert_from(&line[2..3]);
+        score_star_1 += myself.points_for_choice();
+        score_star_1 += myself.points_for_outcome(&opponent);
 
-        score += myself.points_for_choice();
-        score += myself.points_for_outcome(&opponent);
-    }
-
-    println!("Result of Advent of Code Day 2, Star 1: {}", score);
-}
-
-pub fn day_2_star_2() {
-    let lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day2.input");
-
-    let mut score: u32 = 0;
-
-    for line in lines {
-        if line.len() != 3 {
-            break;
-        }
-
-        let opponent = RpsChoice::convert_from(&line[0..1]);
         let myself = RpsChoice::convert_from_opponent_and_result(&opponent, &line[2..3]);
-
-        score += myself.points_for_choice();
-        score += myself.points_for_outcome(&opponent);
+        score_star_2 += myself.points_for_choice();
+        score_star_2 += myself.points_for_outcome(&opponent);
     }
 
-    println!("Result of Advent of Code Day 2, Star 2: {}", score);
+    println!("Result of Advent of Code Day 2, Star 1: {}", score_star_1);
+    println!("Result of Advent of Code Day 2, Star 2: {}", score_star_2);
 }
