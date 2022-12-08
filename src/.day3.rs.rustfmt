@@ -19,10 +19,8 @@ pub fn day_3_star_1() {
 
         let mut bloom_filter: u64 = 0;
         let middle = line.len() / 2;
-        set_bloom_filter(&line[0..middle], &mut bloom_filter);
-        sum_of_priority_collisions += u64::from(
-            check_for_collision(&line[middle..line.len()], &bloom_filter)
-        );
+        set_bloom_filter(&line[0..middle], &bloom_filter);
+        sum_of_priority_collisions += u64::from(check_for_collision(&line[middle..line.len()], &bloom_filter));
     }
 
     println!("Result of Advent of Code Day 3, Star 1: {}", sum_of_priority_collisions);
@@ -50,44 +48,17 @@ pub fn day_3_star_2() {
         panic!("Incomplete group of 3 elves");
     }
 
-    let mut i = 0;
+    let i = 0;
     while i < lines.len() {
-        let mut first_bloom_filter: u64 = 0;
-        let mut second_bloom_filter: u64 = 0;
-        let mut third_bloom_filter: u64 = 0;
-
-        set_bloom_filter(&lines[i], &mut first_bloom_filter);
-        set_bloom_filter(&lines[i+1], &mut second_bloom_filter);
-        set_bloom_filter(&lines[i+2], &mut third_bloom_filter);
-
-        let intersection = first_bloom_filter & second_bloom_filter & third_bloom_filter;
-        sum_of_badge_priorities += u64::from(search_for_set_bit(intersection));
-
-        i += 3;
     }
-
-    println!("Result of Advent of Code Day 3, Star 2: {}", sum_of_badge_priorities);
 }
 
-fn set_bloom_filter(line: &str, bloom_filter: &mut u64) {
+fn set_bloom_filter(line: &str, bloom_filter: &u64) {
     let line = line.as_bytes();
     for i in 0..line.len() {
         let letter_priority = convert_letter_to_priority(line[i]);
         *bloom_filter |= 1 << (letter_priority - 1);
     }
-}
-
-fn search_for_set_bit(intersection: u64) -> u8 {
-    let mut intersection = intersection;
-    for i in 0..52 {
-        if intersection & 1 == 1 {
-            return i + 1;
-        }
-
-        intersection >>= 1;
-    }
-
-    0
 }
 
 fn check_for_collision(line: &str, bloom_filter: &u64) -> u8 {
