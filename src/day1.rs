@@ -1,6 +1,6 @@
 use crate::util::load_lines_of_file;
 
-pub fn day1_star_1() {
+pub fn day_1_star_1() {
     let lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day1.input");
 
     let mut current_max: u32 = 0;
@@ -28,7 +28,7 @@ pub fn day1_star_1() {
     println!("Result of Advent of Code Day 1, Star 1: {}", current_max);
 }
 
-pub fn day1_star_2() {
+pub fn day_1_star_2() {
     let lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day1.input");
     let mut top_three_elves = vec![0, 0, 0];
     let mut current_elve = 0;
