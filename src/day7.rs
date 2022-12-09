@@ -1,4 +1,4 @@
-use std::{collections::HashMap, mem::needs_drop};
+use std::collections::HashMap;
 
 use crate::util::load_lines_of_file;
 
@@ -133,6 +133,7 @@ impl FileSystem {
         current_dir.files.push(file);
     }
 
+    #[allow(dead_code)]
     fn recursive_list(&self) -> String {
         let mut result = String::from("");
         let current_dir = self.current_dir();
@@ -220,6 +221,7 @@ impl Directory {
         self.files_pos.contains_key(name) || self.sub_dirs_pos.contains_key(name)
     }
 
+    #[allow(dead_code)]
     fn recursive_list(&self, indent_level: usize, result: &mut String) {
         let indent_self = "  ".repeat(indent_level);
         result.push_str(&format!("{}- {} (dir)\n", indent_self, self.name));
