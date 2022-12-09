@@ -1,8 +1,9 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, mem::needs_drop};
 
 use crate::util::load_lines_of_file;
 
 struct FileSystem {
+    total_space: usize,
     root: Directory,
     path_indices: Vec<usize>,
 }
@@ -11,6 +12,7 @@ impl FileSystem {
     fn new() -> Self {
         let root = Directory::new("/");
         Self {
+            total_space: 70_000_000,
             root,
             path_indices: vec![],
         }
@@ -138,8 +140,49 @@ impl FileSystem {
 
         result
     }
+
+    fn sizes_of_small_dirs(&self, max_small_dir_size: usize) -> usize {
+        let mut sum = 0;
+        FileSystem::add_small_dir_size(&self.root, &mut sum, &max_small_dir_size);
+        sum
+    }
+
+    fn add_small_dir_size(dir: &Directory, sum: &mut usize, max_small_dir_size: &usize) {
+        let dir_size = dir.total_size();
+        if dir_size <= *max_small_dir_size {
+            *sum += dir_size;
+        }
+
+        for sub_dir in dir.sub_dirs.iter() {
+            FileSystem::add_small_dir_size(sub_dir, sum, max_small_dir_size);
+        }
+    }
+
+    fn free_up_space(&self, needed_space: usize) -> Option<usize> {
+        let mut big_enough_sizes: Vec<usize> = Vec::new();
+        let needed_space = needed_space - (self.total_space - self.root.total_size());
+        FileSystem::add_big_enough_dir_size(&self.root, &mut big_enough_sizes, needed_space);
+
+        big_enough_sizes.iter().min().copied()
+    }
+
+    fn add_big_enough_dir_size(
+        dir: &Directory,
+        big_enough_sizes: &mut Vec<usize>,
+        needed_space: usize,
+    ) {
+        let dir_size = dir.total_size();
+        if dir_size >= needed_space {
+            big_enough_sizes.push(dir_size);
+        }
+
+        for sub_dir in dir.sub_dirs.iter() {
+            FileSystem::add_big_enough_dir_size(sub_dir, big_enough_sizes, needed_space);
+        }
+    }
 }
 
+#[derive(Debug)]
 struct Directory {
     name: String,
     files: Vec<File>,
@@ -157,6 +200,20 @@ impl Directory {
             sub_dirs: Vec::new(),
             sub_dirs_pos: HashMap::new(),
         }
+    }
+
+    fn total_size(&self) -> usize {
+        let mut result = 0;
+
+        for file in self.files.iter() {
+            result += file.size;
+        }
+
+        for sub_dir in self.sub_dirs.iter() {
+            result += sub_dir.total_size();
+        }
+
+        result
     }
 
     fn is_file_or_sub_dir_existing_with_name(&self, name: &str) -> bool {
@@ -181,6 +238,7 @@ impl Directory {
     }
 }
 
+#[derive(Debug)]
 struct File {
     size: usize,
     name: String,
@@ -198,5 +256,12 @@ impl File {
 pub fn day_7_star_1() {
     let logs = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day7.input");
     let file_system = FileSystem::from_logs(&logs);
-    println!("{}", file_system.recursive_list());
+    println!(
+        "Result of Advent of Code Day 7, Star 1: {}",
+        file_system.sizes_of_small_dirs(100_000)
+    );
+    println!(
+        "Result of Advent of Code Day 7, Star 2: {}",
+        file_system.free_up_space(30_000_000).unwrap()
+    );
 }
