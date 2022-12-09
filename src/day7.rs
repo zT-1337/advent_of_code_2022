@@ -8,7 +8,6 @@ struct FileSystem {
 }
 
 impl FileSystem {
-
     fn new() -> Self {
         let root = Directory::new("/");
         Self {
@@ -31,7 +30,7 @@ impl FileSystem {
             let tokens: Vec<&str> = line.split_whitespace().collect();
             match tokens[1] {
                 "cd" => result.execute_cd_command(tokens[2]),
-                "ls" => line_index += result.add_files_from_ls_logs(&logs[line_index+1..]),
+                "ls" => line_index += result.add_files_from_ls_logs(&logs[line_index + 1..]),
                 _ => panic!("Unexpected token: {}", tokens[1]),
             }
 
@@ -56,8 +55,11 @@ impl FileSystem {
 
         while ls_line_tokens.len() > 0 && ls_line_tokens[0] != "$" {
             match ls_line_tokens[0] {
-                "dir" => self.add_children(Directory::new(ls_line_tokens[1])),
-                _ => self.add_file(File::new(ls_line_tokens[0].parse().unwrap(), ls_line_tokens[1])),
+                "dir" => self.add_sub_dir(Directory::new(ls_line_tokens[1])),
+                _ => self.add_file(File::new(
+                    ls_line_tokens[0].parse().unwrap(),
+                    ls_line_tokens[1],
+                )),
             }
             ls_output_offset += 1;
             ls_line_tokens = logs[ls_output_offset].split_whitespace().collect();
@@ -69,7 +71,7 @@ impl FileSystem {
     fn current_dir_mut(&mut self) -> &mut Directory {
         let mut current_dir = &mut self.root;
         for i in self.path_indices.iter() {
-            current_dir = &mut current_dir.children[*i];
+            current_dir = &mut current_dir.sub_dirs[*i];
         }
 
         current_dir
@@ -78,14 +80,14 @@ impl FileSystem {
     fn current_dir(&self) -> &Directory {
         let mut current_dir = &self.root;
         for i in self.path_indices.iter() {
-            current_dir = &current_dir.children[*i];
+            current_dir = &current_dir.sub_dirs[*i];
         }
 
         current_dir
     }
 
     fn change_dir(&mut self, name: &str) {
-        let index = match self.current_dir().children_pos.get(name) {
+        let index = match self.current_dir().sub_dirs_pos.get(name) {
             Some(position) => position,
             None => return,
         };
@@ -103,32 +105,36 @@ impl FileSystem {
         self.path_indices.clear();
     }
 
-    fn add_children(&mut self, dir: Directory) {
+    fn add_sub_dir(&mut self, dir: Directory) {
         let current_dir = self.current_dir_mut();
 
-        if current_dir.is_file_or_child_existing_with_name(&dir.name) {
+        if current_dir.is_file_or_sub_dir_existing_with_name(&dir.name) {
             return;
         }
 
-        current_dir.children_pos.insert(dir.name.clone(), current_dir.children.len());
-        current_dir.children.push(dir);
+        current_dir
+            .sub_dirs_pos
+            .insert(dir.name.clone(), current_dir.sub_dirs.len());
+        current_dir.sub_dirs.push(dir);
     }
 
     fn add_file(&mut self, file: File) {
         let current_dir = self.current_dir_mut();
 
-        if current_dir.is_file_or_child_existing_with_name(&file.name) {
+        if current_dir.is_file_or_sub_dir_existing_with_name(&file.name) {
             return;
         }
 
-        current_dir.files_pos.insert(file.name.clone(), current_dir.files.len());
+        current_dir
+            .files_pos
+            .insert(file.name.clone(), current_dir.files.len());
         current_dir.files.push(file);
     }
 
     fn recursive_list(&self) -> String {
         let mut result = String::from("");
         let current_dir = self.current_dir();
-        current_dir._recursive_list(0, &mut result);
+        current_dir.recursive_list(0, &mut result);
 
         result
     }
@@ -138,8 +144,8 @@ struct Directory {
     name: String,
     files: Vec<File>,
     files_pos: HashMap<String, usize>,
-    children: Vec<Directory>,
-    children_pos: HashMap<String, usize>,
+    sub_dirs: Vec<Directory>,
+    sub_dirs_pos: HashMap<String, usize>,
 }
 
 impl Directory {
@@ -148,26 +154,29 @@ impl Directory {
             name: String::from(name),
             files: Vec::new(),
             files_pos: HashMap::new(),
-            children: Vec::new(),
-            children_pos: HashMap::new(),
+            sub_dirs: Vec::new(),
+            sub_dirs_pos: HashMap::new(),
         }
     }
 
-    fn is_file_or_child_existing_with_name(&self, name: &str) -> bool {
-        self.files_pos.contains_key(name) || self.children_pos.contains_key(name)
+    fn is_file_or_sub_dir_existing_with_name(&self, name: &str) -> bool {
+        self.files_pos.contains_key(name) || self.sub_dirs_pos.contains_key(name)
     }
 
-    fn _recursive_list(&self, indent_level: usize, result: &mut String) {
+    fn recursive_list(&self, indent_level: usize, result: &mut String) {
         let indent_self = "  ".repeat(indent_level);
         result.push_str(&format!("{}- {} (dir)\n", indent_self, self.name));
 
-        let indent_sub = "  ".repeat(indent_level+1);
-        for dir in self.children.iter() {
-            dir._recursive_list(indent_level + 1, result);
+        let indent_sub = "  ".repeat(indent_level + 1);
+        for dir in self.sub_dirs.iter() {
+            dir.recursive_list(indent_level + 1, result);
         }
 
         for file in self.files.iter() {
-            result.push_str(&format!("{}- {} (file, size={})\n", indent_sub, file.name, file.size));
+            result.push_str(&format!(
+                "{}- {} (file, size={})\n",
+                indent_sub, file.name, file.size
+            ));
         }
     }
 }
