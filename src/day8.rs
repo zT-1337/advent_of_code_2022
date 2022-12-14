@@ -1,22 +1,6 @@
 use std::collections::HashMap;
 
-use crate::util::load_lines_of_file;
-
-struct Vec2d {
-    x: usize,
-    y: usize,
-}
-
-impl Vec2d {
-    fn new(x: usize, y: usize) -> Self {
-        Self { x, y }
-    }
-
-    fn set(&mut self, x: usize, y: usize) {
-        self.x = x;
-        self.y = y;
-    }
-}
+use crate::util::{load_lines_of_file, Vec2d};
 
 pub fn day_8_star_2() {
     let mut lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day8.input");

@@ -19,3 +19,19 @@ pub fn load_lines_of_file(path: &str) -> Vec<String> {
 
     lines
 }
+
+pub struct Vec2d {
+    pub x: usize,
+    pub y: usize,
+}
+
+impl Vec2d {
+    pub fn new(x: usize, y: usize) -> Self {
+        Self { x, y }
+    }
+
+    pub fn set(&mut self, x: usize, y: usize) {
+        self.x = x;
+        self.y = y;
+    }
+}
