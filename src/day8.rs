@@ -1,6 +1,18 @@
 use std::collections::HashMap;
 
-use crate::util::{load_lines_of_file, Vec2d};
+use crate::util::load_lines_of_file;
+
+struct Position {
+    x: usize,
+    y: usize,
+}
+
+impl Position {
+    fn set(&mut self, x: usize, y: usize) {
+        self.x = x;
+        self.y = y;
+    }
+}
 
 pub fn day_8_star_2() {
     let mut lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day8.input");
@@ -11,8 +23,11 @@ pub fn day_8_star_2() {
     let height = lines.len();
     let trees = init_trees_from_lines(&lines, width * height);
 
-    let mut current_pos = Vec2d::new(0, 0);
-    let dimensions = Vec2d::new(width, height);
+    let mut current_pos = Position { x: 0, y: 0 };
+    let dimensions = Position {
+        x: width,
+        y: height,
+    };
 
     let mut max_scenic_score = 0;
     for col in 1..(width - 1) {
@@ -32,7 +47,7 @@ pub fn day_8_star_2() {
     );
 }
 
-fn calc_scenic_score(trees: &Vec<u8>, position: &Vec2d, dimensions: &Vec2d) -> u64 {
+fn calc_scenic_score(trees: &Vec<u8>, position: &Position, dimensions: &Position) -> u64 {
     let mut score_top = 0;
     let mut score_bottom = 0;
     let mut score_left = 0;
