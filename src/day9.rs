@@ -84,13 +84,11 @@ impl Rope {
 pub fn day_9_star_1_and_2() {
     let mut lines = load_lines_of_file("/home/zt/Workspace/advent_of_code/src/day9.input");
     lines.pop();
-    let lines = lines;
 
     let mut commands: Vec<Command> = Vec::with_capacity(lines.len());
     for line in lines {
         commands.push(Command::from_line(&line));
     }
-    let commands = commands;
 
     let mut two_knot_line = Rope::new(2);
     let mut two_knot_tail_positions: HashMap<(i32, i32), bool> = HashMap::new();
