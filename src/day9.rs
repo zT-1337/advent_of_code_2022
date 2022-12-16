@@ -1,8 +1,44 @@
 use std::collections::HashMap;
 
-use crate::util::{
-    load_lines_of_file, Vec2d, DOWN_DIRECTION, LEFT_DIRECTION, RIGHT_DIRECTION, UP_DIRECTION,
-};
+use crate::util::load_lines_of_file;
+
+#[derive(Clone)]
+pub struct Vec2d {
+    pub x: i32,
+    pub y: i32,
+}
+
+impl Vec2d {
+    fn new(x: i32, y: i32) -> Self {
+        Self { x, y }
+    }
+
+    fn subtract(left: &Vec2d, right: &Vec2d) -> Vec2d {
+        Vec2d {
+            x: left.x - right.x,
+            y: left.y - right.y,
+        }
+    }
+
+    fn add_to_self(&mut self, other: &Vec2d) {
+        self.x += other.x;
+        self.y += other.y;
+    }
+
+    fn is_touching(&self, other: &Vec2d) -> bool {
+        self.x.abs_diff(other.x) < 2 && self.y.abs_diff(other.y) < 2
+    }
+
+    fn clamp(&mut self, min: i32, max: i32) {
+        self.x = i32::clamp(self.x, min, max);
+        self.y = i32::clamp(self.y, min, max);
+    }
+}
+
+const UP_DIRECTION: Vec2d = Vec2d { x: 0, y: 1 };
+const DOWN_DIRECTION: Vec2d = Vec2d { x: 0, y: -1 };
+const LEFT_DIRECTION: Vec2d = Vec2d { x: -1, y: 0 };
+const RIGHT_DIRECTION: Vec2d = Vec2d { x: 1, y: 0 };
 
 struct Command {
     dir: &'static Vec2d,
