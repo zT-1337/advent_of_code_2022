@@ -115,7 +115,6 @@ impl HeightMap {
 
 #[derive(Debug)]
 struct DijkstraNode {
-    position: usize,
     cost: u64,
     previous: Option<usize>,
 }
@@ -147,29 +146,23 @@ impl DijkstraNode {
         let mut unvisited_node_positions =
             Self::init_unvisited_node_positions(height_map.heights.len());
 
-        loop {
-            let current_node =
-                match Self::find_cheapest_unvisited_node(&nodes, &mut unvisited_node_positions) {
-                    Some(position) => &nodes[position],
-                    None => break,
-                };
+        while unvisited_node_positions.len() != 0 {
+            let current_node_position =
+                Self::dequeue_cheapest_unvisited_node(&nodes, &mut unvisited_node_positions);
+            let current_node = &nodes[current_node_position];
 
             //Only happens if no node exists anymore that is connected somehow with the start
             if current_node.cost == u64::MAX {
                 break;
             }
 
-            let current_node_position = current_node.position;
             //every neighbour is always one step away
             let cost_to_neighbours = current_node.cost + 1;
 
             let neighbour_positions = height_map.find_neighbours(current_node_position);
             for neighbour_position in neighbour_positions {
                 let neighbour = &mut nodes[neighbour_position];
-                if cost_to_neighbours < neighbour.cost {
-                    neighbour.cost = cost_to_neighbours;
-                    neighbour.previous = Some(current_node_position);
-                }
+                neighbour.update(cost_to_neighbours, current_node_position);
             }
         }
 
@@ -178,9 +171,8 @@ impl DijkstraNode {
 
     fn from_height_map(height_map: &HeightMap) -> Vec<Self> {
         let mut result = Vec::with_capacity(height_map.heights.len());
-        for i in 0..height_map.heights.len() {
+        for _ in 0..height_map.heights.len() {
             result.push(Self {
-                position: i,
                 cost: u64::MAX,
                 previous: None,
             });
@@ -200,16 +192,12 @@ impl DijkstraNode {
         result
     }
 
-    fn find_cheapest_unvisited_node(
+    fn dequeue_cheapest_unvisited_node(
         nodes: &Vec<DijkstraNode>,
         unvisited_nodes_positions: &mut Vec<usize>,
-    ) -> Option<usize> {
+    ) -> usize {
         let mut min_cost = u64::MAX;
         let mut current_cheapest_node_position_in_q = 0;
-
-        if unvisited_nodes_positions.len() == 0 {
-            return None;
-        }
 
         for (index, node_position) in unvisited_nodes_positions.iter().enumerate() {
             let node = &nodes[*node_position];
@@ -219,7 +207,14 @@ impl DijkstraNode {
             }
         }
 
-        Some(unvisited_nodes_positions.remove(current_cheapest_node_position_in_q))
+        unvisited_nodes_positions.remove(current_cheapest_node_position_in_q)
+    }
+
+    fn update(&mut self, cost: u64, previous: usize) {
+        if cost < self.cost {
+            self.cost = cost;
+            self.previous = Some(previous);
+        }
     }
 }
 
