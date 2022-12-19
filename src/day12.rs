@@ -63,7 +63,7 @@ impl HeightMap {
     }
 
     fn find_shortest_path(&self) -> Option<Vec<usize>> {
-        let nodes = DijkstraNode::build_dijkstra_tree_for_start_and_end(self);
+        let nodes = DijkstraNode::build_dijkstra_tree(self);
         DijkstraNode::try_to_get_path_from_start_to_end(&nodes, self.start_index, self.end_index)
     }
 
@@ -141,7 +141,7 @@ impl DijkstraNode {
         Some(result)
     }
 
-    fn build_dijkstra_tree_for_start_and_end(height_map: &HeightMap) -> Vec<DijkstraNode> {
+    fn build_dijkstra_tree(height_map: &HeightMap) -> Vec<DijkstraNode> {
         let mut nodes = Self::from_height_map(height_map);
         let mut unvisited_node_positions =
             Self::init_unvisited_node_positions(height_map.heights.len());
