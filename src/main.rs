@@ -1,6 +1,7 @@
 mod day1;
 mod day10;
 mod day11;
+mod day12;
 mod day2;
 mod day3;
 mod day4;
@@ -13,6 +14,7 @@ mod util;
 
 use day10::day_10_star_1;
 use day11::day_11_star_1_and_2;
+use day12::day_12_star_1_and_2;
 use day2::day_2_star_1_and_2;
 use day3::{day_3_star_1, day_3_star_2};
 use day4::day_4_star_1_and_2;
@@ -50,4 +52,6 @@ fn main() {
     day_10_star_1();
 
     day_11_star_1_and_2();
+
+    day_12_star_1_and_2();
 }
