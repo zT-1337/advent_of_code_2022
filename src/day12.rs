@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use crate::util::load_lines_of_file;
 
 struct HeightMap {
@@ -65,68 +63,8 @@ impl HeightMap {
     }
 
     fn find_shortest_path(&self) -> Option<Vec<usize>> {
-        let mut nodes = DijkstraNode::from_height_map(&self);
-        let mut visited_nodes: HashSet<usize> = HashSet::new();
-
-        loop {
-            let current_node = match HeightMap::find_cheapest_unvisited_node(&nodes, &visited_nodes)
-            {
-                Some(position) => &nodes[position],
-                None => break,
-            };
-
-            //Only happens if no node exists anymore that is connected somehow with the start
-            if current_node.cost == u64::MAX {
-                break;
-            }
-
-            let current_node_position = current_node.position;
-            //every neighbour is always one step away
-            let cost_to_neighbours = current_node.cost + 1;
-
-            let neighbour_positions = self.find_neighbours(current_node_position);
-            for neighbour_position in neighbour_positions {
-                let neighbour = &mut nodes[neighbour_position];
-                if cost_to_neighbours < neighbour.cost {
-                    neighbour.cost = cost_to_neighbours;
-                    neighbour.previous = Some(current_node_position);
-                }
-            }
-
-            visited_nodes.insert(current_node_position);
-        }
-
-        if nodes[self.end_index].previous.is_none() {
-            return None;
-        }
-
-        let mut result = Vec::new();
-
-        let mut current_position = self.end_index;
-        while current_position != self.start_index {
-            result.push(current_position);
-            current_position = nodes[current_position].previous.unwrap();
-        }
-        result.reverse();
-
-        Some(result)
-    }
-
-    fn find_cheapest_unvisited_node(
-        nodes: &Vec<DijkstraNode>,
-        visited_nodes: &HashSet<usize>,
-    ) -> Option<usize> {
-        let mut min_cost = u64::MAX;
-        let mut current_cheapest_node_position = None;
-
-        for (index, node) in nodes.iter().enumerate() {
-            if node.cost <= min_cost && !visited_nodes.contains(&index) {
-                min_cost = node.cost;
-                current_cheapest_node_position = Some(index);
-            }
-        }
-
-        current_cheapest_node_position
+        let nodes = DijkstraNode::build_dijkstra_tree_for_start_and_end(self);
+        DijkstraNode::try_to_get_path_from_start_to_end(&nodes, self.start_index, self.end_index)
     }
 
     fn find_neighbours(&self, current_position: usize) -> Vec<usize> {
@@ -183,6 +121,61 @@ struct DijkstraNode {
 }
 
 impl DijkstraNode {
+    fn try_to_get_path_from_start_to_end(
+        nodes: &Vec<DijkstraNode>,
+        start: usize,
+        end: usize,
+    ) -> Option<Vec<usize>> {
+        if nodes[end].previous.is_none() {
+            return None;
+        }
+
+        let mut result = Vec::new();
+
+        let mut current_position = end;
+        while current_position != start {
+            result.push(current_position);
+            current_position = nodes[current_position].previous.unwrap();
+        }
+        result.reverse();
+
+        Some(result)
+    }
+
+    fn build_dijkstra_tree_for_start_and_end(height_map: &HeightMap) -> Vec<DijkstraNode> {
+        let mut nodes = Self::from_height_map(height_map);
+        let mut unvisited_node_positions =
+            Self::init_unvisited_node_positions(height_map.heights.len());
+
+        loop {
+            let current_node =
+                match Self::find_cheapest_unvisited_node(&nodes, &mut unvisited_node_positions) {
+                    Some(position) => &nodes[position],
+                    None => break,
+                };
+
+            //Only happens if no node exists anymore that is connected somehow with the start
+            if current_node.cost == u64::MAX {
+                break;
+            }
+
+            let current_node_position = current_node.position;
+            //every neighbour is always one step away
+            let cost_to_neighbours = current_node.cost + 1;
+
+            let neighbour_positions = height_map.find_neighbours(current_node_position);
+            for neighbour_position in neighbour_positions {
+                let neighbour = &mut nodes[neighbour_position];
+                if cost_to_neighbours < neighbour.cost {
+                    neighbour.cost = cost_to_neighbours;
+                    neighbour.previous = Some(current_node_position);
+                }
+            }
+        }
+
+        nodes
+    }
+
     fn from_height_map(height_map: &HeightMap) -> Vec<Self> {
         let mut result = Vec::with_capacity(height_map.heights.len());
         for i in 0..height_map.heights.len() {
@@ -195,6 +188,38 @@ impl DijkstraNode {
         result[height_map.start_index].cost = 0;
 
         result
+    }
+
+    fn init_unvisited_node_positions(node_count: usize) -> Vec<usize> {
+        let mut result = Vec::with_capacity(node_count);
+
+        for i in 0..node_count {
+            result.push(i);
+        }
+
+        result
+    }
+
+    fn find_cheapest_unvisited_node(
+        nodes: &Vec<DijkstraNode>,
+        unvisited_nodes_positions: &mut Vec<usize>,
+    ) -> Option<usize> {
+        let mut min_cost = u64::MAX;
+        let mut current_cheapest_node_position_in_q = 0;
+
+        if unvisited_nodes_positions.len() == 0 {
+            return None;
+        }
+
+        for (index, node_position) in unvisited_nodes_positions.iter().enumerate() {
+            let node = &nodes[*node_position];
+            if node.cost <= min_cost {
+                min_cost = node.cost;
+                current_cheapest_node_position_in_q = index;
+            }
+        }
+
+        Some(unvisited_nodes_positions.remove(current_cheapest_node_position_in_q))
     }
 }
 
@@ -212,8 +237,7 @@ pub fn day_12_star_1_and_2() {
     let starting_positions = height_map.find_all_possible_starting_positions();
     let mut routes: Vec<Vec<usize>> = Vec::new();
 
-    for (index, starting_position) in starting_positions.iter().enumerate() {
-        println!("{}/{} positions", index, starting_positions.len());
+    for starting_position in starting_positions.iter() {
         height_map.start_index = *starting_position;
         if let Some(route) = height_map.find_shortest_path() {
             routes.push(route);
